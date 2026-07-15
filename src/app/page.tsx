@@ -1,5 +1,6 @@
 import { getLibrary } from "@/lib/data";
 import { Feature } from "@/lib/types";
+import GameLibrary from "@/components/GameLibrary";
 
 export default async function Home() {
   const library = await getLibrary();
@@ -44,53 +45,11 @@ export default async function Home() {
         </header>
 
         {/*
-          TODO: everything below, down through the closing </div> of the
-          roulette overlay, is a static placeholder. A later step replaces
-          it with a single <GameLibrary library={library} /> client
-          component that owns filter/sort/randomiser state.
+          TODO: the roulette overlay below is still a static placeholder.
+          A later step wires it up to real randomiser state owned by
+          GameLibrary.
         */}
-        <div className="bar">
-          <div className="bar-inner">
-            <div className="row1">
-              <div className="search">
-                <svg viewBox="0 0 24 24" fill="none" strokeWidth={2}>
-                  <circle cx="11" cy="11" r="7" />
-                  <path d="M21 21l-4.3-4.3" />
-                </svg>
-                <input
-                  type="search"
-                  placeholder={`Search ${library.games.length} games…`}
-                  autoComplete="off"
-                  disabled
-                />
-              </div>
-              <select aria-label="Sort library" disabled>
-                <option value="name">A → Z</option>
-                <option value="hours">Most played</option>
-                <option value="user">User score</option>
-                <option value="meta">Metascore</option>
-                <option value="year">Newest</option>
-                <option value="unplayed">Least played</option>
-              </select>
-              <button className="btn" id="rollBtn" disabled>
-                🎲 Roll the dice
-              </button>
-            </div>
-            <div className="row2" />
-            <div className="drawer" />
-          </div>
-        </div>
-
-        <div className="meta">
-          <span>
-            Showing <b>{library.games.length}</b> of{" "}
-            <b>{library.games.length}</b>
-          </span>
-          <button className="clear">✕ Clear all filters</button>
-        </div>
-
-        <div className="grid" />
-        <div className="sentinel" />
+        <GameLibrary library={library} />
       </main>
 
       {/* roulette */}
