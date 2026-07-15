@@ -88,7 +88,7 @@ const Feature = {
 };
 
 // Column choice per bit, verified empirically by diffing against the
-// HTML-extracted ground-truth games.json (see docs/PLAN.md step 9). For most
+// HTML-extracted ground-truth games.json. For most
 // bits a single Steam-API "category" column matches exactly; the categories
 // group (cols ~12-92) turned out to be the reliable source over the
 // store-tags group (cols ~93-472), which has more false positives/negatives.
