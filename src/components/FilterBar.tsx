@@ -1,4 +1,6 @@
-import type { SortKey } from '@/lib/types';
+import { CHIPS } from '@/lib/filters';
+import type { Game, SortKey } from '@/lib/types';
+import FilterDrawer from './FilterDrawer';
 
 interface FilterBarProps {
   query: string;
@@ -6,9 +8,39 @@ interface FilterBarProps {
   sort: SortKey;
   onSortChange: (v: SortKey) => void;
   totalCount: number;
+  chips: string[];
+  onToggleChip: (key: string) => void;
+  drawerOpen: boolean;
+  onToggleDrawer: () => void;
+  tags: string[];
+  games: Game[];
+  selectedTags: number[];
+  onToggleTag: (index: number) => void;
+  deck: -1 | 0 | 1 | 2;
+  onDeckChange: (deck: -1 | 0 | 1 | 2) => void;
+  minScore: number;
+  onMinScoreChange: (value: number) => void;
 }
 
-export default function FilterBar({ query, onQueryChange, sort, onSortChange, totalCount }: FilterBarProps) {
+export default function FilterBar({
+  query,
+  onQueryChange,
+  sort,
+  onSortChange,
+  totalCount,
+  chips,
+  onToggleChip,
+  drawerOpen,
+  onToggleDrawer,
+  tags,
+  games,
+  selectedTags,
+  onToggleTag,
+  deck,
+  onDeckChange,
+  minScore,
+  onMinScoreChange,
+}: FilterBarProps) {
   return (
     <div className="bar">
       <div className="bar-inner">
@@ -42,8 +74,35 @@ export default function FilterBar({ query, onQueryChange, sort, onSortChange, to
             🎲 Roll the dice
           </button>
         </div>
-        <div className="row2" />
-        <div className="drawer" />
+        <div className="row2">
+          {CHIPS.map((c) => {
+            const isOn = chips.includes(c.key);
+            return (
+              <button
+                type="button"
+                key={c.key}
+                className={`chip ${isOn ? 'on' : ''} ${isOn && c.mag ? 'mag' : ''}`}
+                onClick={() => onToggleChip(c.key)}
+              >
+                {c.label}
+              </button>
+            );
+          })}
+          <button type="button" className="more-toggle" onClick={onToggleDrawer}>
+            {drawerOpen ? 'Fewer filters ▴' : 'More filters ▾'}
+          </button>
+        </div>
+        <FilterDrawer
+          open={drawerOpen}
+          tags={tags}
+          games={games}
+          selectedTags={selectedTags}
+          onToggleTag={onToggleTag}
+          deck={deck}
+          onDeckChange={onDeckChange}
+          minScore={minScore}
+          onMinScoreChange={onMinScoreChange}
+        />
       </div>
     </div>
   );
