@@ -20,6 +20,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Refreshing game data
+
+The library data lives at `src/data/games.json` and is generated, not hand-edited. To regenerate it from a fresh Steam library CSV export (e.g. from a tool like [Steam Library Export](https://steam-library-export.vercel.app/)), run:
+
+```bash
+npm run data:csv [path-to-csv]
+```
+
+This defaults to `source/steam-library-JudgeZetsumei-1.csv` if no path is given. See `scripts/csv-to-games.mjs` for the column mappings.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
