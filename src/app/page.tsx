@@ -1,65 +1,121 @@
-import Image from "next/image";
+import { getLibrary } from "@/lib/data";
+import { Feature } from "@/lib/types";
 
-export default function Home() {
+export default async function Home() {
+  const library = await getLibrary();
+
+  const totalHours = Math.round(
+    library.games.reduce((sum, game) => sum + game.hours, 0)
+  );
+  const coopCount = library.games.filter(
+    (game) => (game.features & Feature.Coop) !== 0
+  ).length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <div className="aurora" />
+      <div className="grain" />
+
+      <main>
+        <header className="hero">
+          <div>
+            <h1>
+              Game <em>Vault</em>
+            </h1>
+            <p className="sub">
+              JudgeZetsumei&apos;s Steam library — filter it, sort it, or let
+              fate pick tonight&apos;s game.
+            </p>
+          </div>
+          <div className="hero-stats">
+            <div className="stat">
+              <div className="num">{library.games.length}</div>
+              <div className="lbl">Games</div>
+            </div>
+            <div className="stat">
+              <div className="num">{totalHours}</div>
+              <div className="lbl">Hours played</div>
+            </div>
+            <div className="stat">
+              <div className="num">{coopCount}</div>
+              <div className="lbl">Co-op ready</div>
+            </div>
+          </div>
+        </header>
+
+        {/*
+          TODO: everything below, down through the closing </div> of the
+          roulette overlay, is a static placeholder. A later step replaces
+          it with a single <GameLibrary library={library} /> client
+          component that owns filter/sort/randomiser state.
+        */}
+        <div className="bar">
+          <div className="bar-inner">
+            <div className="row1">
+              <div className="search">
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth={2}>
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M21 21l-4.3-4.3" />
+                </svg>
+                <input
+                  type="search"
+                  placeholder={`Search ${library.games.length} games…`}
+                  autoComplete="off"
+                  disabled
+                />
+              </div>
+              <select aria-label="Sort library" disabled>
+                <option value="name">A → Z</option>
+                <option value="hours">Most played</option>
+                <option value="user">User score</option>
+                <option value="meta">Metascore</option>
+                <option value="year">Newest</option>
+                <option value="unplayed">Least played</option>
+              </select>
+              <button className="btn" id="rollBtn" disabled>
+                🎲 Roll the dice
+              </button>
+            </div>
+            <div className="row2" />
+            <div className="drawer" />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="meta">
+          <span>
+            Showing <b>{library.games.length}</b> of{" "}
+            <b>{library.games.length}</b>
+          </span>
+          <button className="clear">✕ Clear all filters</button>
         </div>
+
+        <div className="grid" />
+        <div className="sentinel" />
       </main>
-    </div>
+
+      {/* roulette */}
+      <div className="overlay">
+        <canvas id="burst" />
+        <button className="closer" aria-label="Close">
+          ×
+        </button>
+        <div className="roll-title">Consulting the backlog gods…</div>
+        <div className="reel-window">
+          <div className="centerline" />
+          <div className="reel" />
+        </div>
+        <div className="winner">
+          <div className="wart" />
+          <h2 />
+          <div className="wstats" />
+          <div className="wbtns">
+            <a className="btn primary" target="_blank" rel="noopener">
+              Open in Steam
+            </a>
+            <button className="btn">↻ Roll again</button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
