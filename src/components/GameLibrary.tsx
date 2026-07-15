@@ -6,6 +6,7 @@ import type { FilterState, Library, SortKey } from '@/lib/types';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import FilterBar from './FilterBar';
 import GameGrid from './GameGrid';
+import RandomiserOverlay from './RandomiserOverlay';
 
 type Action =
   | { type: 'SET_QUERY'; query: string }
@@ -64,6 +65,7 @@ export default function GameLibrary({ library }: GameLibraryProps) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [raw, setRaw] = useState('');
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [rollOpen, setRollOpen] = useState(false);
   const debouncedQuery = useDebouncedValue(raw, 160);
 
   useEffect(() => {
@@ -82,6 +84,10 @@ export default function GameLibrary({ library }: GameLibraryProps) {
   const handleClearAll = () => {
     dispatch({ type: 'CLEAR_ALL' });
     setRaw('');
+  };
+
+  const handleRoll = () => {
+    if (filtered.length > 0) setRollOpen(true);
   };
 
   return (
@@ -104,6 +110,7 @@ export default function GameLibrary({ library }: GameLibraryProps) {
         onDeckChange={(deck) => dispatch({ type: 'SET_DECK', deck })}
         minScore={state.minScore}
         onMinScoreChange={(value) => dispatch({ type: 'SET_MIN_SCORE', value })}
+        onRoll={handleRoll}
       />
 
       <div className="meta">
@@ -116,6 +123,8 @@ export default function GameLibrary({ library }: GameLibraryProps) {
       </div>
 
       <GameGrid games={filtered} totalCount={library.games.length} />
+
+      {rollOpen && <RandomiserOverlay pool={filtered} onClose={() => setRollOpen(false)} />}
     </>
   );
 }

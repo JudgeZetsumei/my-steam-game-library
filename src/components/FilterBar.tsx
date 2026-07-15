@@ -20,6 +20,7 @@ interface FilterBarProps {
   onDeckChange: (deck: -1 | 0 | 1 | 2) => void;
   minScore: number;
   onMinScoreChange: (value: number) => void;
+  onRoll: () => void;
 }
 
 export default function FilterBar({
@@ -40,6 +41,7 @@ export default function FilterBar({
   onDeckChange,
   minScore,
   onMinScoreChange,
+  onRoll,
 }: FilterBarProps) {
   return (
     <div className="bar">
@@ -70,7 +72,7 @@ export default function FilterBar({
             <option value="year">Newest</option>
             <option value="unplayed">Least played</option>
           </select>
-          <button className="btn" id="rollBtn">
+          <button className="btn" id="rollBtn" onClick={onRoll}>
             🎲 Roll the dice
           </button>
         </div>
