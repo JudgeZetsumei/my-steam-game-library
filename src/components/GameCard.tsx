@@ -15,7 +15,7 @@ export default function GameCard({ game }: GameCardProps) {
   if (game.features & Feature.OpenWorld) badges.push({ key: 'ow', className: 'bdg', label: 'Open world' });
 
   return (
-    <article className="card in">
+    <article className="card">
       <div className="art">
         <SteamArt appId={game.appId} name={game.name} loading="lazy" />
         {game.deck === 2 && <span className="deckdot v">DECK ✓</span>}

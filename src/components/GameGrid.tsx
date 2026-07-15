@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
 import type { Game } from '@/lib/types';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import GameCard from './GameCard';
 
 const CHUNK = 48;
@@ -21,6 +23,8 @@ export default function GameGrid({ games, totalCount }: GameGridProps) {
   }
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -38,9 +42,44 @@ export default function GameGrid({ games, totalCount }: GameGridProps) {
     return () => observer.disconnect();
   }, [games]);
 
+  // Fade/stagger-in newly mounted cards, mirroring the original's
+  // `renderChunk` — cards render with plain class `"card"` and are
+  // upgraded to `"card in"` here once GSAP (or the reduced-motion
+  // fallback) has run.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const fresh = Array.from(container.querySelectorAll<HTMLElement>('.card:not(.in)'));
+    if (fresh.length === 0) return;
+
+    if (reduceMotion) {
+      fresh.forEach((el) => el.classList.add('in'));
+      return;
+    }
+
+    const tween = gsap.fromTo(
+      fresh,
+      { y: 26, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.5,
+        stagger: 0.022,
+        ease: 'power2.out',
+        onStart: () => fresh.forEach((el) => el.classList.add('in')),
+        clearProps: 'transform',
+      },
+    );
+
+    return () => {
+      tween.kill();
+    };
+  }, [games, visibleCount, reduceMotion]);
+
   return (
     <>
-      <div className="grid">
+      <div className="grid" ref={containerRef}>
         {games.length === 0 ? (
           <div className="empty">
             <div className="big">Nothing matches that combo</div>

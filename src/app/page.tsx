@@ -1,6 +1,7 @@
 import { getLibrary } from "@/lib/data";
 import { Feature } from "@/lib/types";
 import GameLibrary from "@/components/GameLibrary";
+import HeroStats from "@/components/HeroStats";
 
 export default async function Home() {
   const library = await getLibrary();
@@ -28,20 +29,11 @@ export default async function Home() {
               fate pick tonight&apos;s game.
             </p>
           </div>
-          <div className="hero-stats">
-            <div className="stat">
-              <div className="num">{library.games.length}</div>
-              <div className="lbl">Games</div>
-            </div>
-            <div className="stat">
-              <div className="num">{totalHours}</div>
-              <div className="lbl">Hours played</div>
-            </div>
-            <div className="stat">
-              <div className="num">{coopCount}</div>
-              <div className="lbl">Co-op ready</div>
-            </div>
-          </div>
+          <HeroStats
+            games={library.games.length}
+            hours={totalHours}
+            coop={coopCount}
+          />
         </header>
 
         {/*
