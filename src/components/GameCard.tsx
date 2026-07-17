@@ -17,7 +17,7 @@ export default function GameCard({ game }: GameCardProps) {
   return (
     <article className="card">
       <div className="art">
-        <SteamArt appId={game.appId} name={game.name} loading="lazy" />
+        <SteamArt appId={game.appId} name={game.name} artUrl={game.artUrl} loading="lazy" />
         {game.deck === 2 && <span className="deckdot v">DECK ✓</span>}
         {game.deck === 1 && <span className="deckdot p">DECK ~</span>}
         <div className="shine" />

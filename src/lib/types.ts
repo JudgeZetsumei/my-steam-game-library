@@ -25,6 +25,11 @@ export interface Game {
   deck: DeckStatus;
   features: number;
   tagIndexes: number[];
+  /**
+   * Override art URL (SteamGridDB), set at data-generation time only for games
+   * whose legacy Steam CDN header URL is dead. Absent for all others.
+   */
+  artUrl?: string;
 }
 export interface Library {
   tags: string[];

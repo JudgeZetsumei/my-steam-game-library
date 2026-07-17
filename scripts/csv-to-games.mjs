@@ -5,10 +5,13 @@
 //
 // Usage: node scripts/csv-to-games.mjs [path-to-csv]
 //   defaults to source/steam-library-JudgeZetsumei-1.csv
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { parse } from 'csv-parse/sync';
+// Requires Node >= 22.18 (native TypeScript type stripping) to import the
+// shared resolver, which Next server code will also use in Phase 2.
+import { enrichGamesWithArt } from '../src/lib/art-resolver.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -201,6 +204,40 @@ for (const g of games) {
   }
   if (![0, 1, 2].includes(g.deck)) {
     throw new Error(`Game "${g.name}" has invalid deck status ${g.deck}`);
+  }
+}
+
+// --- Art enrichment: bake SGDB `artUrl` overrides for games whose legacy
+// Steam CDN header URL is dead (newer releases with hashed-only assets).
+// Re-runs on every invocation, which also refreshes rotted URLs. ---
+try {
+  process.loadEnvFile(path.join(repoRoot, '.env.local'));
+} catch {
+  // no .env.local — fall through to plain process.env
+}
+const sgdbKey = process.env.SGDB_API_KEY;
+if (sgdbKey) {
+  const result = await enrichGamesWithArt(games, sgdbKey, {
+    onProgress: (msg) => console.log(msg),
+  });
+  console.log(
+    `Art enrichment: ${result.resolved.length} SGDB overrides, ${result.unresolved.length} monogram fallbacks`,
+  );
+} else {
+  console.warn(
+    'SGDB_API_KEY not set (expected in .env.local) — skipping art enrichment; ' +
+      'preserving existing artUrl values from the committed games.json.',
+  );
+  // Non-destructive keyless runs: carry over previously-baked overrides.
+  if (existsSync(outPath)) {
+    const prev = JSON.parse(readFileSync(outPath, 'utf8'));
+    const prevArt = new Map(
+      prev.games.filter((g) => g.artUrl).map((g) => [g.appId, g.artUrl]),
+    );
+    for (const g of games) {
+      const artUrl = prevArt.get(g.appId);
+      if (artUrl) g.artUrl = artUrl;
+    }
   }
 }
 
