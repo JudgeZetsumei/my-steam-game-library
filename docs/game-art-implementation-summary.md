@@ -1,8 +1,15 @@
 # Hybrid game art — implementation summary (Phase 1, done 2026-07-17)
 
 Context for planning the per-SteamID dynamic library feature ("Phase 2").
-Companion docs: `game-art-hybrid-plan.md` (the plan this implements),
-`spike-card-render-bug.md` (the spike that motivated it).
+
+Background: card art was previously constructed client-side from the legacy
+Steam CDN URL pattern alone. Steam no longer populates that path for newer
+releases, so those cards fell through to the monogram placeholder. A spike
+(2026-07-17) verified all 637 legacy URLs in-browser: 13 failed — 7 recent
+titles whose assets exist only at hashed new-style URLs, and 6 delisted/test
+apps with no store assets at all. No constructable URL variant works on the
+new CDN hosts, so a runtime URL-pattern fallback was a dead end; SteamGridDB
+was chosen as the fallback source instead.
 
 ## What was built
 
