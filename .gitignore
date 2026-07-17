@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local Steam library export (source data for `npm run data:csv`; not committed)
+source/steam-library-JudgeZetsumei-1.csv
