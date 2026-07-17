@@ -68,12 +68,22 @@ export default function GameGrid({ games, totalCount }: GameGridProps) {
         stagger: 0.022,
         ease: 'power2.out',
         onStart: () => fresh.forEach((el) => el.classList.add('in')),
-        clearProps: 'transform',
+        // `.in` + CSS is the source of truth for the resting state — clear
+        // *all* inline styles once the tween completes so nothing GSAP set
+        // (opacity included) can linger and override the stylesheet.
+        clearProps: 'opacity,transform',
       },
     );
 
     return () => {
+      // A bare kill() abandons whatever inline opacity/transform exists at
+      // that instant — cards mid-stagger (or not yet started, thanks to
+      // fromTo's immediateRender) would be left stuck translucent/invisible
+      // with `.in` already applied, so the `:not(.in)` selector would never
+      // rescue them. Kill, then wipe the inline styles so `.in` (or a re-run
+      // of this effect for cards that never got it) takes over.
       tween.kill();
+      gsap.set(fresh, { clearProps: 'opacity,transform' });
     };
   }, [games, visibleCount, reduceMotion]);
 
